@@ -50,47 +50,6 @@ driver.quit()
 '''
 # ...existing code...
 
-# Extract text and images from screenshots and create ePub
-book = epub.EpubBook()
-book.set_identifier('id123456')
-book.set_title('A Promised Land')
-book.set_language('en')
-book.add_author('Author Name')
-
-# Create chapters from screenshots
-current_page = 100  # Set this to the actual number of pages
-for i in range(1, current_page + 1):
-    img_path = f"screenshots/page_{i}.png"
-    text = pytesseract.image_to_string(Image.open(img_path))
-    chapter = epub.EpubHtml(title=f'Page {i}', file_name=f'page_{i}.xhtml', lang='en')
-    chapter.content = f'<h1>Page {i}</h1><p>{text}</p>'
-    
-    # Extract images and add to chapter
-    images = pytesseract.image_to_boxes(Image.open(img_path))
-    for j, image in enumerate(images):
-        image_path = f"screenshots/page_{i}_image_{j}.png"
-        image.save(image_path)
-        chapter.content += f'<img src="{image_path}" alt="Image {j}"/>'
-    
-    book.add_item(chapter)
-
-# Define Table Of Contents
-book.toc = (epub.Link('page_1.xhtml', 'Page 1', 'page_1'),)
-
-# Add default NCX and Nav files
-book.add_item(epub.EpubNcx())
-book.add_item(epub.EpubNav())
-
-# Define CSS style
-style = 'BODY {color: black;}'
-nav_css = epub.EpubItem(uid="style_nav", file_name="style/nav.css", media_type="text/css", content=style)
-book.add_item(nav_css)
-
-# Create spine
-book.spine = ['nav'] + [f'page_{i}' for i in range(1, current_page + 1)]
-
-# Write to the file
-epub.write_epub('A_Promised_Land.epub', book, {})
 
 # Combine the screenshots into an ePub file (this part requires additional steps)
 # You can use libraries like `ebooklib` to create an ePub file
